@@ -7,6 +7,16 @@ on:
         description: "FFmpeg version"
         required: true
         default: "9.0.2"
+      target:
+        description: "Build target (leave empty to build all)"
+        required: false
+        default: ""
+        type: choice
+        options:
+          - ""
+          - windows-x64
+          - macos-arm64
+          - macos-x64
   # 不对 main 的普通提交自动构建，避免每次修改都重新编译完整 FFmpeg。
   # 正式构建只由 ffmpeg-* tag 触发；调试时使用 workflow_dispatch 手动触发。
   push:
@@ -26,6 +36,7 @@ env:
 
 jobs:
   windows-x64:
+    if: ${{ inputs.target == '' || inputs.target == 'windows-x64' }}
     name: Windows x64 LGPL runtime
     runs-on: ubuntu-24.04
     steps:
@@ -54,6 +65,7 @@ jobs:
           if-no-files-found: error
 
   macos-arm64:
+    if: ${{ inputs.target == '' || inputs.target == 'macos-arm64' }}
     name: macOS arm64 LGPL runtime
     runs-on: macos-14
     steps:
@@ -78,6 +90,7 @@ jobs:
           if-no-files-found: error
 
   macos-x64:
+    if: ${{ inputs.target == '' || inputs.target == 'macos-x64' }}
     name: macOS x64 LGPL runtime
     runs-on: macos-15-intel
     steps:
