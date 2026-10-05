@@ -10,18 +10,24 @@ OUT="$ROOT/dist"
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
+RUNTIME_STAGE="$OUT/runtime-stage"
+SDK_STAGE="$OUT/sdk-stage"
+mkdir -p "$RUNTIME_STAGE" "$SDK_STAGE"
+
 case "$TARGET" in
   windows-x64)
-    mkdir -p "$OUT/stage"
-    cp "$SRC"/bin/*.dll "$OUT/stage/"
-    cp -R "$SRC/manifest" "$OUT/stage/"
-    (cd "$OUT/stage" && zip -9 -r "$OUT/LiveCatch-ffmpeg-$VERSION-$TARGET.zip" .)
+    cp "$SRC"/bin/*.dll "$RUNTIME_STAGE/"
+    cp -R "$SRC/manifest" "$RUNTIME_STAGE/"
+    cp -R "$SRC/include" "$SDK_STAGE/"
+    cp -R "$SRC/lib" "$SDK_STAGE/"
+    cp -R "$SRC/manifest" "$SDK_STAGE/"
     ;;
   macos-arm64|macos-x64)
-    mkdir -p "$OUT/stage"
-    cp "$SRC"/lib/*.dylib "$OUT/stage/"
-    cp -R "$SRC/manifest" "$OUT/stage/"
-    (cd "$OUT/stage" && zip -9 -r "$OUT/LiveCatch-ffmpeg-$VERSION-$TARGET.zip" .)
+    cp "$SRC"/lib/*.dylib "$RUNTIME_STAGE/"
+    cp -R "$SRC/manifest" "$RUNTIME_STAGE/"
+    cp -R "$SRC/include" "$SDK_STAGE/"
+    cp -R "$SRC/lib" "$SDK_STAGE/"
+    cp -R "$SRC/manifest" "$SDK_STAGE/"
     ;;
   *)
     echo "Unknown target: $TARGET"
@@ -29,4 +35,7 @@ case "$TARGET" in
     ;;
 esac
 
-rm -rf "$OUT/stage"
+(cd "$RUNTIME_STAGE" && zip -9 -r "$OUT/LiveCatch-ffmpeg-$VERSION-$TARGET.zip" .)
+(cd "$SDK_STAGE" && zip -9 -r "$OUT/LiveCatch-ffmpeg-sdk-$VERSION-$TARGET.zip" .)
+
+rm -rf "$RUNTIME_STAGE" "$SDK_STAGE"
