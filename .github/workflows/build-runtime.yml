@@ -7,9 +7,9 @@ on:
         description: "FFmpeg version"
         required: true
         default: "9.0.2"
+  # 不对 main 的普通提交自动构建，避免每次修改都重新编译完整 FFmpeg。
+  # 正式构建只由 ffmpeg-* tag 触发；调试时使用 workflow_dispatch 手动触发。
   push:
-    branches:
-      - "main"
     tags:
       - "ffmpeg-*"
 
