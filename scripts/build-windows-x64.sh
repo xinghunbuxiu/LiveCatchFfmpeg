@@ -20,7 +20,7 @@ fi
 
 cd "$SRC"
 
-./configure   --prefix="$PREFIX"   --target-os=mingw32   --arch=x86_64   --cross-prefix="${TARGET:-x86_64-w64-mingw32}-"   --enable-cross-compile   --enable-shared   --disable-static   --disable-programs   --disable-doc   --disable-debug   --disable-autodetect   --disable-everything   --disable-gpl   --disable-nonfree   --disable-postproc   --disable-avdevice   --enable-protocol=file   --enable-protocol=http   --enable-demuxer=flv   --enable-decoder=h264   --enable-decoder=hevc   --enable-decoder=aac   --enable-parser=h264   --enable-parser=hevc   --enable-parser=aac   --enable-hwaccel=h264_d3d11va   --enable-hwaccel=hevc_d3d11va   --enable-swscale   --enable-swresample
+./configure   --prefix="$PREFIX"   --target-os=mingw32   --arch=x86_64   --cross-prefix="${TARGET:-x86_64-w64-mingw32}-"   --enable-cross-compile   --enable-shared   --disable-static   --disable-programs   --disable-doc   --disable-debug   --disable-autodetect   --disable-everything   --disable-gpl   --disable-nonfree   --disable-avdevice   --enable-protocol=file   --enable-protocol=http   --enable-demuxer=flv   --enable-decoder=h264   --enable-decoder=hevc   --enable-decoder=aac   --enable-parser=h264   --enable-parser=hevc   --enable-parser=aac   --enable-hwaccel=h264_d3d11va   --enable-hwaccel=hevc_d3d11va   --enable-swscale   --enable-swresample
 
 make -j"$(nproc)"
 make install
