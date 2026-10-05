@@ -59,6 +59,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install build dependencies
+        run: brew install nasm pkg-config
+
       - name: Build FFmpeg
         run: bash ./scripts/build-macos.sh arm64
 
@@ -79,6 +82,9 @@ jobs:
     runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: brew install nasm pkg-config
 
       - name: Build FFmpeg
         run: bash ./scripts/build-macos.sh x86_64
