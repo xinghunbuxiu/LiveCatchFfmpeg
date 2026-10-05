@@ -21,7 +21,7 @@ fi
 
 cd "$SRC"
 
-./configure   --prefix="$PREFIX"   --arch="$ARCH"   --enable-shared   --disable-static   --disable-programs   --disable-doc   --disable-debug   --disable-autodetect   --disable-everything   --disable-gpl   --disable-nonfree   --disable-postproc   --disable-avdevice   --enable-protocol=file   --enable-protocol=http   --enable-demuxer=flv   --enable-decoder=h264   --enable-decoder=hevc   --enable-decoder=aac   --enable-parser=h264   --enable-parser=hevc   --enable-parser=aac   --enable-hwaccel=h264_videotoolbox   --enable-hwaccel=hevc_videotoolbox   --enable-swscale   --enable-swresample
+./configure   --prefix="$PREFIX"   --arch="$ARCH"   --enable-shared   --disable-static   --disable-programs   --disable-doc   --disable-debug   --disable-autodetect   --disable-everything   --disable-gpl   --disable-nonfree   --disable-avdevice   --enable-protocol=file   --enable-protocol=http   --enable-demuxer=flv   --enable-decoder=h264   --enable-decoder=hevc   --enable-decoder=aac   --enable-parser=h264   --enable-parser=hevc   --enable-parser=aac   --enable-hwaccel=h264_videotoolbox   --enable-hwaccel=hevc_videotoolbox   --enable-swscale   --enable-swresample
 
 make -j"$(sysctl -n hw.ncpu)"
 make install
