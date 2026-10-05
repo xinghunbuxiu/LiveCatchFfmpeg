@@ -13,6 +13,11 @@ on:
     tags:
       - "ffmpeg-*"
 
+# 只保留最新一次构建，旧的排队/运行中的同组任务自动取消。
+concurrency:
+  group: ffmpeg-runtime
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
@@ -29,7 +34,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y             build-essential             mingw-w64             yasm             nasm             pkg-config             curl             xz-utils             zip
+          sudo apt-get install -y build-essential mingw-w64 yasm nasm pkg-config curl xz-utils zip
 
       - name: Build FFmpeg
         env:
