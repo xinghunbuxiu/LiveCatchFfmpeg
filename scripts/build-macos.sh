@@ -4,7 +4,12 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION="${FFMPEG_VERSION:-9.0.2}"
 ARCH="${1:?usage: build-macos.sh arm64|x86_64}"
-PREFIX="$ROOT/build/runtime/macos-$ARCH"
+if [[ "$ARCH" == "x86_64" ]]; then
+  TARGET="macos-x64"
+else
+  TARGET="macos-arm64"
+fi
+PREFIX="$ROOT/build/runtime/$TARGET"
 SRC="$ROOT/build/src/ffmpeg-$VERSION"
 ARCHIVE="$ROOT/build/src/ffmpeg-$VERSION.tar.xz"
 URL="https://ffmpeg.org/releases/ffmpeg-$VERSION.tar.xz"
