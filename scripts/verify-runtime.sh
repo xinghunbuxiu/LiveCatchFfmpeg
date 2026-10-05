@@ -20,7 +20,7 @@ case "$TARGET" in
   macos-arm64|macos-x64)
     required=(libavcodec libavformat libavutil libswresample libswscale)
     for name in "${required[@]}"; do
-      compgen -G "$DIR/lib/${name}.*.dylib" >/dev/null || {
+      test -f "$DIR/lib/${name}.dylib" || {
         echo "Missing $name dylib"
         exit 1
       }
