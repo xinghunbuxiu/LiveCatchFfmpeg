@@ -20,8 +20,10 @@ case "$TARGET" in
   macos-arm64|macos-x64)
     required=(libavcodec libavformat libavutil libswresample libswscale)
     for name in "${required[@]}"; do
-      test -f "$DIR/lib/${name}.dylib" || {
+      # FFmpeg's macOS shared libraries are versioned (e.g. libavcodec.62.dylib).
+      compgen -G "$DIR/lib/${name}*.dylib" >/dev/null || {
         echo "Missing $name dylib"
+        ls -la "$DIR/lib" || true
         exit 1
       }
     done
