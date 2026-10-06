@@ -100,7 +100,7 @@ jobs:
 
   release:
     name: Publish GitHub Release
-    if: ${{ startsWith(github.ref, 'refs/tags/ffmpeg-') }}
+    if: ${{ startsWith(github.ref, 'refs/tags/ffmpeg-') || github.ref == 'refs/heads/main' }}
     needs: [windows-x64, macos-arm64, macos-x64]
     runs-on: ubuntu-24.04
     steps:
@@ -118,5 +118,6 @@ jobs:
           files: |
             release-assets/*.zip
             release-assets/SHA256SUMS.txt
+          tag_name: ffmpeg-9.0.2-lc1
           generate_release_notes: true
           prerelease: true
