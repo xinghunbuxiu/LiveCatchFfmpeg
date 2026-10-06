@@ -18,13 +18,11 @@ on:
           - macos-arm64
           - macos-x64
   push:
-    branches:
-      - main
     tags:
       - "ffmpeg-*"
 
 concurrency:
-  group: ffmpeg-runtime
+  group: ffmpeg-runtime-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -100,7 +98,7 @@ jobs:
 
   release:
     name: Publish GitHub Release
-    if: ${{ startsWith(github.ref, 'refs/tags/ffmpeg-') || github.ref == 'refs/heads/main' }}
+    if: ${{ startsWith(github.ref, 'refs/tags/ffmpeg-') }}
     needs: [windows-x64, macos-arm64, macos-x64]
     runs-on: ubuntu-24.04
     steps:
@@ -118,6 +116,6 @@ jobs:
           files: |
             release-assets/*.zip
             release-assets/SHA256SUMS.txt
-          tag_name: ffmpeg-9.0.2-lc1
+          tag_name: ${{ github.ref_name }}
           generate_release_notes: true
           prerelease: true
