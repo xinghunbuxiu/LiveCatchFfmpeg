@@ -1,0 +1,59 @@
+name: Build FFmpeg - All Platforms
+
+on:
+  workflow_dispatch:
+    inputs:
+      ffmpeg_version:
+        description: "FFmpeg version"
+        required: true
+        default: "9.0.2"
+        type: string
+      target:
+        description: "Build one platform or all platforms"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all
+          - windows-x64
+          - macos-arm64
+          - macos-x64
+
+permissions:
+  contents: read
+
+jobs:
+  platform:
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - windows-x64
+          - macos-arm64
+          - macos-x64
+    if: ${{ inputs.target == 'all' || inputs.target == matrix.target }}
+    uses: ./.github/workflows/build-ffmpeg-platform.yml
+    with:
+      ffmpeg_version: ${{ inputs.ffmpeg_version }}
+      target: ${{ matrix.target }}
+
+  summary:
+    name: FFmpeg build summary
+    if: ${{ always() }}
+    needs: [platform]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Report result
+        env:
+          RESULT: ${{ needs.platform.result }}
+        run: |
+          echo "FFmpeg platform workflow result: $RESULT"
+          if [ "$RESULT" = "failure" ]; then
+            echo "One or more platforms failed. Re-run failed jobs only; successful platform jobs do not need to rebuild."
+            exit 1
+          fi
+          if [ "$RESULT" = "cancelled" ]; then
+            echo "FFmpeg platform workflow was cancelled."
+            exit 1
+          fi
+          echo "All selected FFmpeg platforms completed successfully."
