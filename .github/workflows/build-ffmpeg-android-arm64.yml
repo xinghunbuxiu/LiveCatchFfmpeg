@@ -1,0 +1,69 @@
+name: Build FFmpeg Android ARM64
+
+on:
+  workflow_dispatch:
+    inputs:
+      ffmpeg_version:
+        description: "FFmpeg version"
+        required: true
+        default: "9.0.2"
+      android_api:
+        description: "Android API level"
+        required: true
+        default: "24"
+
+concurrency:
+  group: ffmpeg-android-arm64-${{ inputs.ffmpeg_version }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  FFMPEG_VERSION: ${{ inputs.ffmpeg_version }}
+  ANDROID_API_LEVEL: ${{ inputs.android_api }}
+  ANDROID_NDK_VERSION: "27.2.12479018"
+
+jobs:
+  build:
+    name: Android arm64-v8a
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
+        run: sdkmanager "ndk;${{ env.ANDROID_NDK_VERSION }}"
+
+      - name: Export NDK
+        run: |
+          echo "ANDROID_NDK_HOME=${ANDROID_SDK_ROOT}/ndk/${ANDROID_NDK_VERSION}" >> "$GITHUB_ENV"
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential yasm nasm pkg-config curl xz-utils zip
+
+      - name: Build FFmpeg
+        run: bash ./scripts/build-android-arm64.sh
+
+      - name: Verify runtime
+        run: bash ./scripts/verify-runtime.sh android-arm64
+
+      - name: Package
+        run: bash ./scripts/package-runtime.sh android-arm64
+
+      - name: Upload Android FFmpeg packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-packages-android-arm64-${{ inputs.ffmpeg_version }}
+          path: dist/*.zip
+          if-no-files-found: error
