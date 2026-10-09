@@ -19,6 +19,12 @@ android-arm64)
  mkdir -p "$RUNTIME_STAGE/arm64-v8a"
  cp "$SRC"/lib/*.so "$RUNTIME_STAGE/arm64-v8a/"; cp -R "$SRC/manifest" "$RUNTIME_STAGE/"
  cp -R "$SRC/include" "$SDK_STAGE/"; cp -R "$SRC/lib" "$SDK_STAGE/"; cp -R "$SRC/manifest" "$SDK_STAGE/" ;;
+ios-arm64)
+ # iOS apps link static archives; ship headers and archives as the SDK package.
+ cp -R "$SRC/include" "$SDK_STAGE/"; cp -R "$SRC/lib" "$SDK_STAGE/"; cp -R "$SRC/manifest" "$SDK_STAGE/"
+ cp -R "$SRC/manifest" "$RUNTIME_STAGE/"
+ mkdir -p "$RUNTIME_STAGE/lib"
+ cp "$SRC"/lib/*.a "$RUNTIME_STAGE/lib/" ;;
 *) echo "Unknown target: $TARGET"; exit 2 ;;
 esac
 (cd "$RUNTIME_STAGE" && zip -9 -r "$OUT/LiveCatch-ffmpeg-$VERSION-$TARGET.zip" .)
