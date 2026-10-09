@@ -27,11 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target:
-          - windows-x64
-          - macos-arm64
-          - macos-x64
-    if: ${{ inputs.target == 'all' || inputs.target == matrix.target }}
+        target: ${{ inputs.target == 'all' && fromJSON('["windows-x64","macos-arm64","macos-x64"]') || fromJSON(format('["{0}"]', inputs.target)) }}
     uses: ./.github/workflows/build-ffmpeg-platform.yml
     with:
       ffmpeg_version: ${{ inputs.ffmpeg_version }}
