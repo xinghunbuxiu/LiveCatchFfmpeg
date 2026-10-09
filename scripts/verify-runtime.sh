@@ -14,5 +14,9 @@ macos-arm64|macos-x64)
 android-arm64)
  required=(libavcodec libavformat libavutil libswresample libswscale)
  for name in "${required[@]}"; do find "$DIR/lib" -maxdepth 1 -type f -name "${name}*.so" -print -quit | grep -q . || exit 1; done ;;
+ios-arm64)
+ required=(libavcodec libavformat libavutil libswresample libswscale)
+ for name in "${required[@]}"; do test -f "$DIR/lib/${name}.a" || exit 1; done ;;
+*) echo "Unknown target: $TARGET"; exit 2 ;;
 esac
 echo "Runtime verification passed: $TARGET"
