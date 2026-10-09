@@ -23,8 +23,8 @@ permissions:
   contents: read
 
 env:
-  FFMPEG_VERSION: ${{ inputs.ffmpeg_version }}
-  IOS_DEPLOYMENT_TARGET: ${{ inputs.ios_deployment_target }}
+  FFMPEG_VERSION: ${{ inputs.ffmpeg_version || '9.0.2' }}
+  IOS_DEPLOYMENT_TARGET: ${{ inputs.ios_deployment_target || '13.0' }}
 
 jobs:
   build:
@@ -55,6 +55,6 @@ jobs:
       - name: Upload iOS FFmpeg packages
         uses: actions/upload-artifact@v4
         with:
-          name: ffmpeg-packages-ios-arm64-${{ inputs.ffmpeg_version }}
+          name: ffmpeg-packages-ios-arm64-${{ env.FFMPEG_VERSION }}
           path: dist/*.zip
           if-no-files-found: error
