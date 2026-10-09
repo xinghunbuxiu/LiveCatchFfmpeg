@@ -1,0 +1,56 @@
+name: Build FFmpeg iOS ARM64
+
+on:
+  workflow_dispatch:
+    inputs:
+      ffmpeg_version:
+        description: "FFmpeg version"
+        required: true
+        default: "9.0.2"
+      ios_deployment_target:
+        description: "Minimum iOS version"
+        required: true
+        default: "13.0"
+
+concurrency:
+  group: ffmpeg-ios-arm64-${{ inputs.ffmpeg_version }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  FFMPEG_VERSION: ${{ inputs.ffmpeg_version }}
+  IOS_DEPLOYMENT_TARGET: ${{ inputs.ios_deployment_target }}
+
+jobs:
+  build:
+    name: iOS arm64 device
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          xcode-select -p
+          xcrun --sdk iphoneos --show-sdk-version
+          xcrun --sdk iphoneos --show-sdk-path
+
+      - name: Install build dependencies
+        run: brew install nasm pkg-config
+
+      - name: Build FFmpeg
+        run: bash ./scripts/build-ios-arm64.sh
+
+      - name: Verify runtime
+        run: bash ./scripts/verify-runtime.sh ios-arm64
+
+      - name: Package
+        run: bash ./scripts/package-runtime.sh ios-arm64
+
+      - name: Upload iOS FFmpeg packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-packages-ios-arm64-${{ inputs.ffmpeg_version }}
+          path: dist/*.zip
+          if-no-files-found: error
