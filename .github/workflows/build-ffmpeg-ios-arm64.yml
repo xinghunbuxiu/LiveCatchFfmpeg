@@ -1,6 +1,9 @@
 name: Build FFmpeg iOS ARM64
 
 on:
+  push:
+    paths:
+      - '.github/workflows/build-ffmpeg-ios-arm64.yml'
   workflow_dispatch:
     inputs:
       ffmpeg_version:
@@ -25,6 +28,7 @@ env:
 
 jobs:
   build:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-mobile-ffmpeg-build]') }}
     name: iOS arm64 device
     runs-on: macos-15
     steps:
