@@ -60,8 +60,8 @@ jobs:
           path: dist/*.zip
           if-no-files-found: error
 
+      # Always attach so LiveCatch fetch-ffmpeg-*.sh can consume without a second step.
       - name: Attach to Release ffmpeg-${{ env.FFMPEG_VERSION }}-lc1
-        if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[publish-mobile-ffmpeg]') }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ffmpeg-${{ env.FFMPEG_VERSION }}-lc1
