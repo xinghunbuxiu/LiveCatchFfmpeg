@@ -1,0 +1,66 @@
+name: Publish Mobile FFmpeg to Release
+
+# Mobile CI currently only uploads Actions artifacts. This workflow copies those
+# packaged zips onto an existing ffmpeg-* Release tag so LiveCatch fetch scripts
+# can consume them (same names as desktop: LiveCatch-ffmpeg-*-{android,ios}-arm64.zip).
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to attach assets to"
+        required: true
+        default: "ffmpeg-9.0.2-lc1"
+      android_run_id:
+        description: "Successful Android arm64 workflow run id"
+        required: true
+        default: "37881980163"
+      ios_run_id:
+        description: "Successful iOS arm64 workflow run id"
+        required: true
+        default: "37881894114"
+
+concurrency:
+  group: ffmpeg-publish-mobile-${{ inputs.tag }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    name: Attach mobile zips to ${{ inputs.tag }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Download Android + iOS artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          gh run download "${{ inputs.android_run_id }}" \
+            --repo "${{ github.repository }}" \
+            --dir android-art
+          gh run download "${{ inputs.ios_run_id }}" \
+            --repo "${{ github.repository }}" \
+            --dir ios-art
+          # Artifacts unpack into named folders; flatten *.zip into release-assets.
+          find android-art ios-art -type f -name 'LiveCatch-ffmpeg*.zip' -print -exec cp -f {} release-assets/ \;
+          ls -la release-assets
+          test -f release-assets/LiveCatch-ffmpeg-9.0.2-android-arm64.zip
+          test -f release-assets/LiveCatch-ffmpeg-sdk-9.0.2-android-arm64.zip
+          test -f release-assets/LiveCatch-ffmpeg-9.0.2-ios-arm64.zip
+          test -f release-assets/LiveCatch-ffmpeg-sdk-9.0.2-ios-arm64.zip
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          files: release-assets/*.zip
+          fail_on_unmatched_files: true
+          append_body: true
+          body: |
+            ### Mobile packages (attached)
+            - android-arm64 / ios-arm64 from Actions runs
+              `${{ inputs.android_run_id }}` / `${{ inputs.ios_run_id }}`
