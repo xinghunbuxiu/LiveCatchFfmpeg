@@ -11,7 +11,7 @@ windows-x64)
 macos-arm64|macos-x64)
  required=(libavcodec libavformat libavutil libswresample libswscale)
  for name in "${required[@]}"; do find "$DIR/lib" -maxdepth 1 -type f -name "${name}*.dylib" -print -quit | grep -q . || exit 1; done ;;
-android-arm64)
+android-arm64|android-armv7)
  required=(libavcodec libavformat libavutil libswresample libswscale)
  for name in "${required[@]}"; do find "$DIR/lib" -maxdepth 1 -type f -name "${name}*.so" -print -quit | grep -q . || exit 1; done ;;
 ios-arm64)

@@ -19,6 +19,10 @@ android-arm64)
  mkdir -p "$RUNTIME_STAGE/arm64-v8a"
  cp "$SRC"/lib/*.so "$RUNTIME_STAGE/arm64-v8a/"; cp -R "$SRC/manifest" "$RUNTIME_STAGE/"
  cp -R "$SRC/include" "$SDK_STAGE/"; cp -R "$SRC/lib" "$SDK_STAGE/"; cp -R "$SRC/manifest" "$SDK_STAGE/" ;;
+android-armv7)
+ mkdir -p "$RUNTIME_STAGE/armeabi-v7a"
+ cp "$SRC"/lib/*.so "$RUNTIME_STAGE/armeabi-v7a/"; cp -R "$SRC/manifest" "$RUNTIME_STAGE/"
+ cp -R "$SRC/include" "$SDK_STAGE/"; cp -R "$SRC/lib" "$SDK_STAGE/"; cp -R "$SRC/manifest" "$SDK_STAGE/" ;;
 ios-arm64)
  # iOS apps link static archives; ship headers and archives as the SDK package.
  cp -R "$SRC/include" "$SDK_STAGE/"; cp -R "$SRC/lib" "$SDK_STAGE/"; cp -R "$SRC/manifest" "$SDK_STAGE/"

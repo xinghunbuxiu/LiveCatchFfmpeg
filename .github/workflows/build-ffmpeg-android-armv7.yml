@@ -1,0 +1,89 @@
+name: Build FFmpeg Android ARMv7
+
+on:
+  push:
+    paths:
+      - '.github/workflows/build-ffmpeg-android-armv7.yml'
+  workflow_dispatch:
+    inputs:
+      ffmpeg_version:
+        description: "FFmpeg version"
+        required: true
+        default: "9.0.2"
+      android_api:
+        description: "Android API level"
+        required: true
+        default: "24"
+
+concurrency:
+  group: ffmpeg-android-armv7-${{ inputs.ffmpeg_version }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: read
+
+env:
+  FFMPEG_VERSION: ${{ inputs.ffmpeg_version || '9.0.2' }}
+  ANDROID_API_LEVEL: ${{ inputs.android_api || '24' }}
+  ANDROID_NDK_VERSION: "27.2.12479018"
+
+jobs:
+  build:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[run-mobile-ffmpeg-build]') }}
+    name: Android armeabi-v7a
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Android SDK and NDK
+        run: |
+          SDK_ROOT="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager | sort | tail -n 1)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "sdkmanager not found under $SDK_ROOT/cmdline-tools" >&2
+            exit 1
+          fi
+          yes | "$SDKMANAGER" --licenses >/dev/null
+          "$SDKMANAGER" --install "platform-tools" "ndk;${ANDROID_NDK_VERSION}"
+          echo "ANDROID_NDK_HOME=$SDK_ROOT/ndk/${ANDROID_NDK_VERSION}" >> "$GITHUB_ENV"
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential yasm nasm pkg-config curl xz-utils zip
+
+      - name: Build FFmpeg
+        run: bash ./scripts/build-android-armv7.sh
+
+      - name: Verify runtime
+        run: bash ./scripts/verify-runtime.sh android-armv7
+
+      - name: Package
+        run: bash ./scripts/package-runtime.sh android-armv7
+
+      - name: Upload Android FFmpeg packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-packages-android-armv7-${{ env.FFMPEG_VERSION }}
+          path: dist/*.zip
+          if-no-files-found: error
+
+      # Always attach so LiveCatch fetch-ffmpeg-*.sh can consume without a second step.
+      - name: Attach to Release ffmpeg-${{ env.FFMPEG_VERSION }}-lc1
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ffmpeg-${{ env.FFMPEG_VERSION }}-lc1
+          files: dist/*.zip
+          fail_on_unmatched_files: true
+          append_body: true
+          body: |
+            ### android-armv7
+            Attached from workflow run `${{ github.run_id }}`.
