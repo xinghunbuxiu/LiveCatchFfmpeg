@@ -23,9 +23,20 @@ android-arm64|android-armv7)
    nm -D "$avcodec_so" 2>/dev/null | grep -qw "$sym" || {
      echo "ERROR: $sym missing from libavcodec (built without --enable-jni?)" >&2; exit 1; }
  done
- # Real hwcontext presence check: the mediacodec device must expose its symbol.
- nm -D "$avutil_so" 2>/dev/null | grep -qi 'ff_hwcontext_mediacodec' || {
+ # hwcontext_mediacodec.c registers itself through the internal
+ # ff_hwcontext_type_mediacodec symbol, which is hidden from .dynsym. Its own
+ # strings are the reliable trace, since that translation unit only gets linked
+ # when --enable-mediacodec turned it on.
+ strings "$avutil_so" | grep -qx 'mediacodec' || {
    echo "ERROR: mediacodec hwcontext missing from libavutil (--enable-mediacodec?)" >&2; exit 1; }
+ # A JNI-less build compiles av_jni_set_java_vm down to "mov w0,#-38; ret".
+ # Detect that body so a stubbed JNI cannot pass as working support.
+ jni_body="$(objdump -d --no-show-raw-insn "$avcodec_so" 2>/dev/null \
+   | awk '/<av_jni_set_java_vm>:/{f=1;next} f&&/^$/{exit} f' | head -3)"
+ if printf '%s' "$jni_body" | grep -qE 'mov[[:space:]]+w0, *#-0x26|mov[[:space:]]+w0, *#-38'; then
+   echo "ERROR: av_jni_set_java_vm is a -ENOSYS stub; JNI was not enabled" >&2
+   exit 1
+ fi
  # The decoder itself, not just the wrapper API.
  strings "$avcodec_so" | grep -q '^h264_mediacodec$' || {
    echo "ERROR: h264_mediacodec decoder not compiled into libavcodec" >&2; exit 1; }
