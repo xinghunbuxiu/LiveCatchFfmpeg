@@ -67,6 +67,15 @@ make distclean >/dev/null 2>&1 || true
   --enable-parser=aac \
   --enable-swscale \
   --enable-swresample \
+  --enable-jni \
+  --enable-mediacodec \
+  --enable-decoder=h264_mediacodec \
+  --enable-decoder=hevc_mediacodec \
+  --enable-decoder=mpeg4_mediacodec \
+  --enable-decoder=vp8_mediacodec \
+  --enable-decoder=vp9_mediacodec \
+  --enable-bsf=h264_mp4toannexb \
+  --enable-bsf=hevc_mp4toannexb \
   --extra-cflags="-fPIC -mfpu=neon" \
   --extra-ldflags="-Wl,-z,max-page-size=16384"
 JOBS="$(sysctl -n hw.ncpu 2>/dev/null || nproc)"

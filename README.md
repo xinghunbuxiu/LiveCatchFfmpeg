@@ -26,7 +26,7 @@ It is intentionally separate from the LiveCatch application source code.
 
 Push a tag such as:
 
-    ffmpeg-9.0.2-lc1
+    ffmpeg-9.0.2-lc2
 
 GitHub Actions builds the supported runtimes and publishes a prerelease containing ZIP packages and SHA256SUMS.txt.
 

@@ -10,7 +10,7 @@ on:
       tag:
         description: "Release tag to attach assets to"
         required: true
-        default: "ffmpeg-9.0.2-lc1"
+        default: "ffmpeg-9.0.2-lc2"
       android_run_id:
         description: "Successful Android arm64 workflow run id"
         required: true
